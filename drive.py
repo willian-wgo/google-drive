@@ -37,7 +37,7 @@ class Drive:
 
         return file_list
 
-    def search_file(self, folder_id, file_name):
+    def search_file(self, folder_id: str, file_name: str):
         file_list = self.get_files(folder_id)
         file = None
 
@@ -49,28 +49,28 @@ class Drive:
 
         return file
 
-    def create_dir(self, folder_id, folder_name):
-        sub_folder = folder_name.split('/', 1)
-
-        file = self.search_file(folder_id, sub_folder[0])
+    def create_dir(self, folder_id: str, folder_list: list):
+        """Create all sub-folders
+        """
+        file = self.search_file(folder_id, folder_list[0])
         if file is None:
             new_folder = {
-                'title': sub_folder[0],
+                'title': folder_list[0],
                 'parents': [{'id': folder_id}],
                 "mimeType": "application/vnd.google-apps.folder"
             }
             file = self.drive.CreateFile(new_folder)
             file.Upload()
 
-            logging.info(f'{sub_folder[0]} folder created successfully')
+            logging.info(f'{folder_list[0]} folder created successfully')
             logging.debug(f'tittle: {file["title"]}, id {file["id"]}')
 
-        if len(sub_folder) > 1:
-            file = self.create_dir(file['id'], sub_folder[1])
+        if len(folder_list) > 1:
+            file = self.create_dir(file['id'], folder_list[1])
 
         return file
 
-    def upload_file(self, folder_id, file_path):
+    def upload_file(self, folder_id: str, file_path: str):
         file = self.search_file(folder_id, path.basename(file_path))
 
         # Create new file is not exists else update it
@@ -88,18 +88,18 @@ class Drive:
         logging.info(f'{file["title"]} uploaded successfully')
         logging.debug(f'tittle: {file["title"]}, id {file["id"]}')
 
-    def download_file(self, folder_id, file_name, local_dir):
+    def download_file(self, folder_id: str, file_name: str, local_dir: str):
         file1 = self.search_file(folder_id, file_name)
         file2 = self.drive.CreateFile({'id': file1['id']})
         file2.GetContentFile(path.join(local_dir, file_name))
         logging.info(f'File downloaded successfully to {path.join(local_dir, file_name)}')
 
-    def trash_file(self, folder_id, file_name):
+    def trash_file(self, folder_id: str, file_name: str):
         file = self.search_file(folder_id, file_name)
         file.Trash()
         logging.info(f'{file_name} deleted successfully')
 
-    def diff_local_remote_dir(self, folder_id, local_files):
+    def diff_local_remote_dir(self, folder_id: str, local_files: list):
         file_list1 = self.get_files(folder_id)
         file_list2 = [file['title'] for file in file_list1]
         remote_files = set(file_list2)
