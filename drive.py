@@ -66,7 +66,8 @@ class Drive:
             logging.debug(f'tittle: {file["title"]}, id {file["id"]}')
 
         if len(folder_list) > 1:
-            file = self.create_dir(file['id'], folder_list[1])
+            folder_list.pop(0)
+            file = self.create_dir(file['id'], folder_list)
 
         return file
 
