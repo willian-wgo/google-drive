@@ -1,4 +1,4 @@
 .idea
 venv
-client_secrets.json
-credentials.json
+resources/client_secrets.json
+resources/credentials.json

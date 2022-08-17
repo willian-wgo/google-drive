@@ -7,6 +7,7 @@ from pydrive2.drive import GoogleDrive
 
 config.fileConfig('resources/logging.cfg')
 
+
 class DriveException(Exception):
     pass
 
@@ -18,7 +19,7 @@ class Drive:
 
     @staticmethod
     def __auth():
-        g_auth = GoogleAuth(settings_file='settings.yaml')
+        g_auth = GoogleAuth(settings_file='resources/settings.yaml')
         g_auth.LocalWebserverAuth()
         g_drive = GoogleDrive(g_auth)
         logging.info('Successful authentication on Drive')
