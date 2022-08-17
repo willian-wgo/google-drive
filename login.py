@@ -1,11 +1,11 @@
 import logging
+from logging import config
 from os import path
 
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
 
-logging.basicConfig(level=logging.DEBUG, format='%(process)d %(asctime)s %(levelname)s:%(message)s')
-
+config.fileConfig('resources/logging.cfg')
 
 class DriveException(Exception):
     pass
@@ -49,19 +49,25 @@ class Drive:
         return file
 
     def create_dir(self, folder_id, folder_name):
-        file = self.search_file(folder_id, folder_name)
+        sub_folder = folder_name.split('/', 1)
 
+        file = self.search_file(folder_id, sub_folder[0])
         if file is None:
             new_folder = {
-                'title': folder_name,
+                'title': sub_folder[0],
                 'parents': [{'id': folder_id}],
                 "mimeType": "application/vnd.google-apps.folder"
             }
             file = self.drive.CreateFile(new_folder)
             file.Upload()
 
-        logging.info(f'{folder_name} folder created successfully')
-        logging.debug(f'tittle: {file["title"]}, id {file["id"]}')
+            logging.info(f'{sub_folder[0]} folder created successfully')
+            logging.debug(f'tittle: {file["title"]}, id {file["id"]}')
+
+        if len(sub_folder) > 1:
+            file = self.create_dir(file['id'], sub_folder[1])
+
+        return file
 
     def upload_file(self, folder_id, file_path):
         file = self.search_file(folder_id, path.basename(file_path))
